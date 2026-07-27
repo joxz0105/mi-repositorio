@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagrama de Plataforma Interactiva - Sistema de Asientos</title>
+<style>
+:root {
+  --bg: #FAF7F2;
+  --bg-soft: #F3EEE5;
+  --ink: #0E0E10;
+  --ink-soft: #2B2B2B;
+  --gold: #C8A24A;
+  --gold-soft: #E7D3A1;
+  --wine: #7A1F3D;
+  --white: #FFFFFF;
+  --border: rgba(43, 43, 43, 0.12);
+  --shadow: 0 4px 24px rgba(14, 14, 16, 0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink-soft);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+header h1 {
+  font-size: 24px;
+  color: var(--ink);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+header h1 span { color: var(--gold); }
+header p { font-size: 13px; color: rgba(43,43,43,.6); letter-spacing: 1px; }
+
+/* Diagram Layout */
+.diagram-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px;
+  gap: 40px;
+}
+
+.node {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px; 
+  width: 280px;
+  box-shadow: var(--shadow);
+  position: relative;
+  z-index: 2;
+  border-top: 4px solid var(--ink);
+  cursor: pointer; 
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.node:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 32px rgba(14, 14, 16, 0.12);
+}
+
+.node.gold-accent { border-top-color: var(--gold); }
+.node.wine-accent { border-top-color: var(--wine); }
+.node.dark-accent { background: var(--ink); color: var(--white); border: none; }
+
+.node h3 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.node.dark-accent h3 { color: var(--gold-soft); }
+
+.feature-list {
+  list-style: none;
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+}
+
+.node.dark-accent .feature-list { color: rgba(255,255,255,0.7); }
+
+.feature-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.node.dark-accent .feature-list li { border-bottom-color: rgba(231,211,161,.15); }
+.feature-list li:last-child { border-bottom: none; }
+.feature-list li::before {
+  content: '✦';
+  color: var(--gold);
+  font-size: 10px;
+}
+
+/* Card images */
+.node-img-wrap {
+  width: 100%;
+  height: 120px; 
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-top: 10px;
+  background: var(--bg-soft); /* Fondo suave por si la imagen tarda en cargar */
+}
+
+.node-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.85) contrast(1.05); 
+}
+
+/* Flexbox lines */
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  position: relative;
+}
+
+.connector-vertical {
+  width: 2px;
+  height: 40px;
+  background: var(--gold);
+  margin: 0 auto;
+}
+
+.connector-horizontal {
+  position: absolute;
+  top: -20px;
+  left: calc(140px + 20px); 
+  right: calc(140px + 20px);
+  height: 2px;
+  background: var(--gold);
+  z-index: 1;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.col::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  background: var(--gold);
+}
+
+.pill {
+  background: var(--bg-soft);
+  border: 1px solid var(--gold);
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: -10px;
+  z-index: 3;
+}
+
+/* Lightbox Modal */
+#lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(14, 14, 16, 0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  cursor: pointer;
+}
+
+#lightbox-img-wrap {
+  width: 90%;
+  height: 90%;
+  max-width: 1200px;
+  max-height: 800px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid var(--gold);
+  box-shadow: 0 16px 48px rgba(200, 162, 74, 0.2);
+}
+
+#lightbox-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; 
+  background: var(--bg);
+}
+
+#close-btn {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  color: var(--white);
+  font-size: 32px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Plataforma de <span>Asientos</span></h1>
+  <p>ARQUITECTURA WEB INTERACTIVA Y FLUJOS DE USUARIO</p>
+</header>
+
+<div class="diagram-container">
+  
+  <!-- Nivel 1: Login -->
+  <div class="node dark-accent" style="width: 320px;" onclick="openLightbox('login.png.jpg')">
+    <h3>1. Autenticación (Login)</h3>
+    <ul class="feature-list">
+      <li>Acceso con correo y contraseña</li>
+      <li>Redirección inteligente por rol</li>
+    </ul>
+    <div class="node-img-wrap">
+      <img src="login.png.jpg" alt="Login Flow" class="node-img">
+    </div>
+  </div>
+
+  <div class="connector-vertical"></div>
+
+  <!-- Nivel 2: Bifurcación -->
+  <div class="row">
+    <div class="connector-horizontal"></div>
+    
+    <!-- Columna 1: Tú -->
+    <div class="col">
+      <div class="pill">Tú</div>
+      <div class="node gold-accent" onclick="openLightbox('admin.png.jpg')">
+        <h3>2A. Dashboard Admin</h3>
+        <ul class="feature-list">
+          <li>Métricas globales de la plataforma</li>
+          <li>Gestión de clientes y suscripciones</li>
+          <li>Estado de uso</li>
+        </ul>
+        <div class="node-img-wrap">
+          <img src="admin.png.jpg" alt="Admin Dashboard" class="node-img">
+        </div>
+      </div>
+      <div class="connector-vertical"></div>
+      <div class="node dark-accent" onclick="openLightbox('constructor2.png.jpg')">
+        <h3>Constructor de Recintos</h3>
+        <ul class="feature-list">
+          <li>Carga de SVG/HTML técnico</li>
+          <li>Configuración de aforos y zonas</li>
+          <li>Asignación exclusiva de Admin</li>
+        </ul>
+        <div class="node-img-wrap">
+          <img src="constructor2.png.jpg" alt="Map Constructor" class="node-img">
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna 2: Organizador -->
+    <div class="col">
+      <div class="pill">Organizador</div>
+      <div class="node" onclick="openLightbox('cliente.png.jpg')">
+        <h3>2B. Dashboard Cliente</h3>
+        <ul class="feature-list">
+          <li>Vista de recintos pre-configurados</li>
+          <li>Resumen rápido de ocupación</li>
+          <li>Creación de cuentas para su equipo</li>
+        </ul>
+        <div class="node-img-wrap">
+          <img src="cliente.png.jpg" alt="Client Dashboard" class="node-img">
+        </div>
+      </div>
+      <div class="connector-vertical"></div>
+      <div class="node wine-accent" onclick="openLightbox('gestion.png.jpg')">
+        <h3>Gestión de Evento (Edición)</h3>
+        <ul class="feature-list">
+          <li>Croquis interactivo detallado</li>
+          <li>Asignación manual de nombres</li>
+          <li>Configuración de WhatsApp</li>
+        </ul>
+        <div class="node-img-wrap">
+          <img src="gestion.png.jpg" alt="Event Gestión / Automation" class="node-img">
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna 3: Recepción -->
+    <div class="col">
+      <div class="pill">Staff Evento</div>
+      <div class="node" style="border-top-color: #8A8D8F;" onclick="openLightbox('recepcion.png.jpg')">
+        <h3>3. Modo Recepción</h3>
+        <ul class="feature-list">
+          <li>Acceso directo al evento del día</li>
+          <li>Mapa visual de solo lectura</li>
+          <li>Buscador global ágil (Nombres)</li>
+          <li>Check-in en tiempo real</li>
+        </ul>
+        <div class="node-img-wrap">
+          <img src="recepcion.png.jpg" alt="Reception Mode" class="node-img">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" onclick="closeLightbox()">
+  <div id="close-btn">&times;</div>
+  <div id="lightbox-img-wrap">
+    <img id="lightbox-img" src="" alt="Full view">
+  </div>
+</div>
+
+<script>
+function openLightbox(imgSrc) {
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  lightboxImg.src = imgSrc;
+  lightbox.style.display = 'flex';
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('lightbox');
+  lightbox.style.display = 'none';
+  // Pequeño timeout para limpiar el src y evitar destellos de imágenes previas
+  setTimeout(() => {
+    document.getElementById('lightbox-img').src = '';
+  }, 200);
+}
+
+// Cerrar con la tecla 'Escape'
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeLightbox();
+  }
+});
+</script>
+
+</body>
+</html>
