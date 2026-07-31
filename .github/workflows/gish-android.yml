@@ -15,10 +15,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: gish-android
-
     steps:
       - uses: actions/checkout@v4
 
@@ -28,14 +24,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # The ubuntu runner image already ships the Android SDK, so there is no
+      # third-party setup action here: fewer moving parts, and it keeps working
+      # on repositories that restrict Actions to GitHub-authored ones.
+      - name: Show Android SDK environment
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls "$ANDROID_HOME/ndk" || echo "no ndk directory"
 
       - name: Install NDK
-        run: sdkmanager --install "ndk;26.3.11579264"
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install \
+            "ndk;26.3.11579264" "platforms;android-34" "build-tools;34.0.0"
 
       - name: Build debug APK
-        run: ./gradlew --no-daemon assembleDebug
+        working-directory: gish-android
+        run: ./gradlew --no-daemon --stacktrace assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
