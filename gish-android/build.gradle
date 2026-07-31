@@ -1,0 +1,5 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// jcenter() was shut down in 2021; repositories now live in settings.gradle.
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}

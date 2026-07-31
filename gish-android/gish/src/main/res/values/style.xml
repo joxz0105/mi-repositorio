@@ -1,0 +1,20 @@
+<resources>
+    <!--
+        minSdk is 21, so the old values-v11 / values-v14 / values-v21 ladder is
+        gone and Material is simply the base everywhere.
+    -->
+    <style name="AppBaseTheme" parent="@android:style/Theme.Material">
+    </style>
+
+    <!-- Launcher / settings theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+    </style>
+
+    <!-- In-game theme: fullscreen, no decorations, black behind the GL surface. -->
+    <style name="GishGameTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>

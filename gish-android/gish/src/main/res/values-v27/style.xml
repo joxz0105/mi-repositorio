@@ -1,0 +1,13 @@
+<resources>
+    <!--
+        Let the GL surface extend into the display cutout on notched devices
+        rather than being letterboxed away from it.
+    -->
+    <style name="GishGameTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

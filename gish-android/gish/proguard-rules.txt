@@ -1,0 +1,17 @@
+# The native engine reaches into these from JNI by name (see cpp/Gish/android/a_utils.c),
+# so they must survive shrinking and obfuscation regardless of what R8 can prove.
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keep class ru.exlmoto.gish.GishActivity {
+    public static void doVibrate(int, int);
+    public static void openUrl(java.lang.String);
+}
+
+-keep class ru.exlmoto.gish.GishLauncherActivity$GishSettings {
+    public static <fields>;
+}
+
+# SDL calls back into its own Java layer from C.
+-keep class org.libsdl.app.** { *; }

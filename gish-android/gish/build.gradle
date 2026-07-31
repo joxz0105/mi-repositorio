@@ -1,0 +1,81 @@
+apply plugin: 'com.android.application'
+
+android {
+    // AGP 8 requires the namespace here instead of package="..." in the manifest.
+    namespace 'ru.exlmoto.gish'
+
+    compileSdk 34
+    ndkVersion '26.3.11579264'
+
+    defaultConfig {
+        applicationId "ru.exlmoto.gish"
+
+        // SDL2 + OpenAL + GL4ES all build against API 21 comfortably, and 21 is
+        // the practical floor now that 64-bit ABIs are mandatory.
+        minSdk 21
+        targetSdk 34
+
+        versionCode 4
+        versionName "1.2.1"
+
+        ndk {
+            // arm64-v8a and x86_64 are required for Play Store uploads and for
+            // any device shipping without 32-bit runtime support.
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+
+        externalNativeBuild {
+            ndkBuild {
+                arguments "APP_PLATFORM=android-21"
+                arguments "-j" + Runtime.runtime.availableProcessors()
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
+            /*************************************************************************************
+             * Use the following command to build a signed APK-package:
+             * $ ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$KEY_FILE \
+                                           -Pandroid.injected.signing.store.password=$STORE_PWD \
+                                           -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+                                           -Pandroid.injected.signing.key.password=$KEY_PWD
+            *************************************************************************************/
+        }
+        debug {
+            // Lets a debug build sit alongside a release install on the same device.
+            applicationIdSuffix '.debug'
+        }
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/cpp/Android.mk'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        jniLibs {
+            // Uncompressed .so libraries loaded straight from the APK.
+            useLegacyPackaging = false
+        }
+    }
+
+    lint {
+        // The vendored org.libsdl.app sources trip a lot of legacy lint checks.
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.13.1'
+    // Used to walk a user-picked SAF tree when importing the Gish data folder.
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+}
